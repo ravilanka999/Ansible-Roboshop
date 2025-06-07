@@ -3,7 +3,7 @@
   become: yes
   tasks:
 
-  - name: copying mongo repo
+  - name: copy mongo repo
     ansble.builtin.copy:
       src: mongo.repo
       dest: /etc/yum.repos.d/mongo.repo
