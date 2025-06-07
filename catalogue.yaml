@@ -56,3 +56,18 @@
       state: started
       enabled: yes
   
+  - name: copy mongodb repo
+    ansible.builtin.copy:
+      src: mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo
+
+  - name: Installing mongodb-host
+    ansible.builtin.dnf:
+      name: mongodb-mongosh
+      state: present
+
+  - name: loading products data 
+    community.mongodb.mongodb_shell:
+      file: "/app/db/master-data.js"
+      login_host: mongodb.sindhu.agency
+      idempotent: yes
