@@ -36,3 +36,22 @@
       src: /tmp/catalogue.zip
       dest: /app
       remote_src: yes
+
+  - name: Installing dependencies
+    community.general.npm:
+      path: /app
+
+  - name: copying service file to system directory
+    ansible.builtin.copy:
+      src: catalogue.service
+      dest: /etc/systemd/system/catalogue.service
+
+  - name: Daemon-reload
+    ansible.builtin.systemd_service:
+      daemon_reload: true
+
+  - name: Enable and start Catalogue service
+    ansible.builtin.service:
+      name: catalogue
+      state: started
+      enabled: yes
