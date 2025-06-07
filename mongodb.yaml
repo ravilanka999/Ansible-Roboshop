@@ -2,8 +2,8 @@
   hosts: Mongodb
   become: yes
   tasks:
-  
-  - name: copying mongo repo to /etc/yum.repos.d/mongo.repo
+
+  - name: copying mongo repo
     ansble.builtin.copy:
      src: mongo.repo
      dest: /etc/yum.repos.d/mongo.repo
