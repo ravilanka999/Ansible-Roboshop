@@ -11,8 +11,8 @@
 
   - name: installing redis
     ansible.builtin.dnf:
-    name: redis
-    state: present
+      name: redis
+      state: present
 
   - name: updating listening address
     ansible.builtin.replace:
