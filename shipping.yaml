@@ -54,14 +54,12 @@
       state: started
       enabled: yes
 
-  - name: Installing mysql
+  - name: removing mysql 
     ansible.builtin.dnf:
       name: mysql
-      state: installed
+      state: absent
 
   - name: import data
-    tags:
-    - import
     community.mysql.mysql_db:
       name: all
       login_user: root
@@ -75,8 +73,6 @@
     - /app/db/master-data.sql
 
   - name: restart shipping
-    tags:
-    - import
     ansible.builtin.service:
       state: restarted
       name: shipping
