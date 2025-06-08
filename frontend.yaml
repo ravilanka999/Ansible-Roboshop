@@ -1,15 +1,14 @@
-- name: configuring frontend
+- name: configure frontend component
   hosts: frontend
   become: yes
   tasks:
-
-  - name: disabling default nginx
+  - name: disable default nginx
     ansible.builtin.command: dnf module disable nginx -y
 
-  - name: enabling required nginx version
+  - name: enable nginx
     ansible.builtin.command: dnf module enable nginx:1.24 -y
 
-  - name: installing nginx
+  - name: install nginx
     ansible.builtin.dnf:
       name: nginx
       state: present
@@ -30,29 +29,23 @@
       path: /usr/share/nginx/html
       state: directory
 
-  
-  - name: Downloading frontend code
+  - name: download frontend code
     ansible.builtin.get_url:
-       url: https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip 
-       dest: /tmp/frontend.zip
+      url: https://roboshop-artifacts.s3.amazonaws.com/frontend-v3.zip
+      dest: /tmp/frontend.zip
 
-  - name: Extract frontend code
+  - name: unzip frontend code
     ansible.builtin.unarchive:
       src: /tmp/frontend.zip
       dest: /usr/share/nginx/html
       remote_src: yes
 
-  - name: remove default nginx configuration file
+  - name: remove default nginx conf
     ansible.builtin.file:
       path: /etc/nginx/nginx.conf
       state: absent
 
-  # - name: enable  nginx file
-  #   ansible.builtin.file:
-  #     path: /etc/nginx/nginx.conf
-  #     state: present
-
-  - name: copying nginx configuration file
+  - name: copy roboshop nginx conf
     ansible.builtin.copy:
       src: nginx.conf
       dest: /etc/nginx/nginx.conf
