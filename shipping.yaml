@@ -59,6 +59,11 @@
       name: mysql
       state: absent
 
+  - name: Make sure pymysql is present
+    pip:
+      name: pymysql
+      state: present
+
   - name: import data
     community.mysql.mysql_db:
       name: all
