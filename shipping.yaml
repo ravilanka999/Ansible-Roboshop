@@ -1,80 +1,81 @@
-- name: Configuring shipping server
+- name: configure shipping component
   hosts: shipping
   become: yes
-  tasks: 
+  tasks:
+  - name: install maven and mysql
+    ansible.builtin.dnf:
+      name: "{{ item }}"
+      state: installed
+    loop:
+    - maven
+    - mysql
+    
+  - name: install PyMySQL and cryptography 
+    ansible.builtin.pip:
+      name: "{{ item }}"
+      executable: pip3.9
+    loop:
+    - cryptography
+    - PyMySQL
 
-  - name: installing Maven
-    ansible.builtin.command: dnf install maven -y
+  - name: create app directory
+    ansible.builtin.file:
+      path: /app
+      state: directory
 
-  - name: Creating roboshop user
+  - name: create roboshop system user
     ansible.builtin.user:
       name: roboshop
       shell: /sbin/nologin
       system: true
       home: /app
 
-  - name: crating app drectory
-    ansible.builtin.file:
-      path: /app
-      state: directory
-
-  - name: Downloading Application code
+  - name: download shipping code
     ansible.builtin.get_url:
-       url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip 
-       dest: /tmp/shipping.zip
+      url: https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip 
+      dest: /tmp/shipping.zip
 
-  - name: Extracting the dowloaded code
+  - name: extract shipping code
     ansible.builtin.unarchive:
       src: /tmp/shipping.zip
       dest: /app
       remote_src: yes
 
-  - name: installing maven dependencies
+  - name: install maven dependencies
     ansible.builtin.command: mvn clean package
     args:
       chdir: /app
 
-  - name: rename jar file 
-    ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar 
+  - name: rename jar file
+    ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
     args:
       chdir: /app
 
-  - name: copying service file to system directory
+  - name: copy shipping service
     ansible.builtin.copy:
       src: shipping.service
       dest: /etc/systemd/system/shipping.service
 
-  - name: Daemon-reload
+  - name: daemon reload
     ansible.builtin.systemd_service:
       daemon_reload: true
 
-  - name: Enable and start shipping service
+  - name: enable and start shipping
     ansible.builtin.service:
       name: shipping
       state: started
       enabled: yes
 
-  - name: removing mysql 
-    ansible.builtin.dnf:
-      name: mysql
-      state: absent
-
-  - name: Make sure pymysql is present
-    pip:
-      name: pymysql
-      state: present
-
-  - name: Make sure cryptography
-    pip:
-      name: cryptography
-      state: present
-
-  - name: install rsync on the ansible controller
-    package:
-      name: rsync
-      state: present
+  # - name: connect to mysql using app user
+  #   community.mysql.mysql_info:
+  #     login_user: shipping
+  #     login_password: RoboShop@1
+  #     login_host: mysql.daws84s.site
+  #     login_db: cities
 
   - name: import data
+    tags:
+    - import
     community.mysql.mysql_db:
       name: all
       login_user: root
@@ -88,8 +89,12 @@
     - /app/db/master-data.sql
 
   - name: restart shipping
+    tags:
+    - import
     ansible.builtin.service:
       state: restarted
       name: shipping
   
 
+
+  
