@@ -69,6 +69,11 @@
       name: cryptography
       state: present
 
+  - name: install rsync on the ansible controller
+    package:
+      name: rsync
+      state: present
+
   - name: import data
     community.mysql.mysql_db:
       name: all
