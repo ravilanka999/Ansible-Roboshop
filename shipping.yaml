@@ -64,6 +64,11 @@
       name: pymysql
       state: present
 
+  - name: Make sure cryptography
+    pip:
+      name: cryptography
+      state: present
+
   - name: import data
     community.mysql.mysql_db:
       name: all
